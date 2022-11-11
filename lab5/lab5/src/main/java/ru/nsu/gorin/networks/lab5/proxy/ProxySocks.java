@@ -1,6 +1,8 @@
 package ru.nsu.gorin.networks.lab5.proxy;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xbill.DNS.*;
 import org.xbill.DNS.Record;
 import ru.nsu.gorin.networks.lab5.util.OpType;
@@ -16,6 +18,8 @@ import java.util.Arrays;
 
 
 public class ProxySocks implements Runnable {
+    private static final Logger logger = LogManager.getLogger(ProxySocks.class);
+
     private int bufferSize = 8192;
     private int port;
     private InetAddress address;
@@ -47,7 +51,7 @@ public class ProxySocks implements Runnable {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
@@ -56,6 +60,7 @@ public class ProxySocks implements Runnable {
         ServerSocketChannel serverChannel = ServerSocketChannel.open();
         serverChannel.configureBlocking(false);
         serverChannel.socket().bind(new InetSocketAddress(address,port));
+        logger.info("server successfully bound");
         serverChannel.register(selector,serverChannel.validOps());
         return selector;
     }
@@ -64,30 +69,35 @@ public class ProxySocks implements Runnable {
         if (key.isValid()) {
             try {
                 if (key.isAcceptable()) {
+                    logger.info("accepting key");
                     accept(key);
                 } else if (key.isConnectable()) {
+                    logger.info("connecting key");
                     connect(key);
                 } else if (key.isReadable()) {
+                    logger.info("reading key");
                     read(key);
                 } else if (key.isWritable()) {
+                    logger.info("writing key");
                     write(key);
                 }
             } catch (Exception e) {
                 close(key);
-                e.printStackTrace();
+                logger.error(e);
             }
         }
     }
     private void accept(SelectionKey key) throws IOException {
         ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
         SocketChannel channel = serverSocketChannel.accept();
+        logger.info(channel);
         channel.configureBlocking(false);
         channel.register(key.selector(),SelectionKey.OP_READ);
-
     }
 
     private void read(SelectionKey key) throws IOException {
         var attachment = (Attachment)key.attachment();
+        logger.info(attachment);
         if (attachment == null) {
             attachment= new Attachment();
             attachment.in = ByteBuffer.allocate(bufferSize);
@@ -99,6 +109,7 @@ public class ProxySocks implements Runnable {
             var channel = (DatagramChannel) key.channel();
             if (channel.read(attachment.in) <= 0) {
                 close(key);
+                logger.error("Invalid DNS reply");
                 throw new IOException("Invalid DNS reply");
             } else {
                 var message = new Message(attachment.in.array());
@@ -110,8 +121,8 @@ public class ProxySocks implements Runnable {
                     key.cancel();
                     key.channel().close();
                 } else {
-
                     close(key);
+                    logger.error("Host cannot be resolved");
                     throw new RuntimeException("Host cannot be resolved");
                 }
             }
@@ -136,7 +147,7 @@ public class ProxySocks implements Runnable {
 
     private void readAndRequestAuthMessage(SelectionKey key) throws IllegalStateException{
         var attachment = (Attachment)key.attachment();
-
+        logger.info(attachment);
         byte[] buffer = attachment.in.array();
 
         if (buffer[0] != Utils.VERSION) {
@@ -307,6 +318,7 @@ public class ProxySocks implements Runnable {
         key.cancel();
         key.channel().close();
         SelectionKey peerKey = ((Attachment) key.attachment()).peer;
+        logger.info(peerKey);
         if (peerKey != null) {
             ((Attachment)peerKey.attachment()).peer=null;
             if((peerKey.interestOps()&SelectionKey.OP_WRITE) == 0 ) {

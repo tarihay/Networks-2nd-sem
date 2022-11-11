@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 
 public class Main {
     public static void main(String[] args) throws UnknownHostException {
+        System.out.println(InetAddress.getLocalHost().getHostAddress());
         ProxySocks proxy = new ProxySocks(InetAddress.getLocalHost(), 8185);
         proxy.run();
     }
