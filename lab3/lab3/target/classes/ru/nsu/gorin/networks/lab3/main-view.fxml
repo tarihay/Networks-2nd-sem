@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nsu.gorin.networks.lab3.MainController">
+    <top>
+        <Label alignment="CENTER" prefHeight="48.0" prefWidth="152.0" text="Lab3" textAlignment="CENTER" textOverrun="CLIP" BorderPane.alignment="CENTER">
+            <font>
+                <Font name="Verdana" size="18.0" />
+            </font>
+        </Label>
+    </top>
+    <center>
+        <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <top>
+                <TextField fx:id="userInput" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#searchRequest" prefHeight="25.0" prefWidth="300.0" promptText="Enter name of something....." BorderPane.alignment="CENTER" />
+            </top>
+            <center>
+                <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <content>
+                        <VBox fx:id="resultsVBox" alignment="TOP_CENTER" prefHeight="405.0" prefWidth="290.0" spacing="5.0">
+                            <padding>
+                                <Insets left="10.0" top="10.0" />
+                            </padding></VBox>
+                    </content></ScrollPane>
+            </center>
+            <left>
+                <ScrollPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="407.0" prefWidth="210.0" BorderPane.alignment="CENTER">
+                    <content>
+                        <VBox fx:id="descriptionVBox" alignment="TOP_CENTER" spacing="10.0">
+                            <padding>
+                                <Insets left="10.0" />
+                            </padding>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </left>
+            <right>
+                <VBox prefHeight="407.0" prefWidth="210.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <Label alignment="CENTER" prefHeight="60.0" prefWidth="210.0" text="Weather">
+                            <font>
+                                <Font name="Verdana" size="30.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets top="30.0" />
+                            </VBox.margin>
+                        </Label>
+                        <Label fx:id="weatherLabel" alignment="CENTER" prefHeight="318.0" prefWidth="210.0" />
+                    </children>
+                </VBox>
+            </right>
+        </BorderPane>
+    </center>
+</BorderPane>
